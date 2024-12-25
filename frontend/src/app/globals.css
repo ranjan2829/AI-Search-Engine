@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .nav-button {
+    @apply p-2 rounded-lg transition-all duration-300 hover:bg-white/10;
+  }
+
+  .primary-button {
+    @apply flex items-center px-8 py-4 text-lg font-semibold text-white 
+           bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-full 
+           hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+
+  .secondary-button {
+    @apply flex items-center px-8 py-4 text-lg font-semibold text-white 
+           bg-white/10 rounded-full hover:bg-white/20
+           hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+
+  .feature-pill {
+    @apply flex items-center px-6 py-3 rounded-full text-sm 
+           bg-white/10 backdrop-blur-sm border border-white/20 
+           hover:bg-white/20 transition-colors hover:border-white/30;
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
 
 :root {
   --background: #ffffff;
