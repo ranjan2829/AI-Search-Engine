@@ -1,5 +1,9 @@
 # AI Search Engine Development Tasks
 
+
+https://github.com/user-attachments/assets/1d3c91a9-0ec5-4c5f-8fee-ba553fe2b53b
+
+
 ## Today's Objectives:
 
 ### 1. Frontend Development
