@@ -1,11 +1,25 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import axios from 'axios';
 import { 
   FiSearch, FiCpu, FiArrowLeft, FiGithub, FiInfo, FiBook, 
   FiCommand, FiZap, FiBrain, FiDatabase, FiTrendingUp 
 } from 'react-icons/fi';
 import AIBackground from './AIBackground';
+
+interface SearchResult {
+  title: string;
+  link: string;
+  snippet?: string;
+}
+
+interface SearchResponse {
+  results: SearchResult[];
+  total_results: number;
+  query_time: number;
+  timestamp: string;
+}
 
 export default function SearchEngine() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,23 +27,22 @@ export default function SearchEngine() {
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [aiThinking, setAiThinking] = useState(false);
   const [processingSteps, setProcessingSteps] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulated AI processing steps
   const simulateAIProcessing = async () => {
     const steps = [
-      "Initializing neural networks...",
-      "Processing natural language...",
-      "Analyzing context and semantics...",
-      "Accessing knowledge base...",
-      "Generating intelligent results...",
+      "Initializing search process...",
+      "Processing query...",
+      "Analyzing search parameters...",
+      "Fetching results...",
+      "Processing response..."
     ];
 
-    setAiThinking(true);
     for (const step of steps) {
       setProcessingSteps(prev => [...prev, step]);
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
-    setAiThinking(false);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -38,70 +51,53 @@ export default function SearchEngine() {
 
     setIsSearching(true);
     setProcessingSteps([]);
-    await simulateAIProcessing();
-    setIsSearching(false);
+    setAiThinking(true);
+    setError(null);
+    setSearchResults([]);
+
+    try {
+      await simulateAIProcessing();
+      
+      const response = await axios.post<SearchResponse>('http://localhost:8000/search', {
+        query: searchQuery,
+        max_results: 10
+      });
+      
+      setSearchResults(response.data.results);
+      
+    } catch (error) {
+      console.error('Search error:', error);
+      setError('Failed to fetch search results. Please try again.');
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+      setAiThinking(false);
+    }
   };
 
-  // AI-powered search suggestions
   useEffect(() => {
-    const suggestions = [
+    setSearchSuggestions([
       "Latest AI developments",
       "Machine learning algorithms",
       "Neural network architectures",
       "Deep learning applications"
-    ];
-    setSearchSuggestions(suggestions);
+    ]);
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white">
       <AIBackground />
       
-      {/* Enhanced Navbar */}
       <nav className="fixed w-full top-0 z-20 bg-black/30 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/">
-                <button className="nav-button group">
-                  <FiArrowLeft className="w-5 h-5 group-hover:text-blue-400" />
-                </button>
-              </Link>
-              <FiCpu className="w-8 h-8 text-blue-500 animate-pulse" />
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">
-                AI Search
-              </h2>
-            </div>
-            
-            <div className="flex items-center space-x-6">
-              <Link href="https://github.com/yourusername/your-repo" target="_blank">
-                <button className="nav-button group">
-                  <FiGithub className="w-5 h-5 group-hover:text-blue-400" />
-                </button>
-              </Link>
-              <Link href="/docs">
-                <button className="nav-button group">
-                  <FiBook className="w-5 h-5 group-hover:text-purple-400" />
-                </button>
-              </Link>
-              <Link href="/about">
-                <button className="nav-button group">
-                  <FiInfo className="w-5 h-5 group-hover:text-pink-400" />
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
+        {/* ... (keep your existing navbar code) ... */}
       </nav>
 
-      {/* Main Content */}
       <main className="flex-grow flex flex-col items-center justify-start px-4 pt-24">
         <div className="w-full max-w-4xl mx-auto">
-          {/* AI Status Indicator */}
+          {/* Status Indicator */}
           <div className="flex items-center justify-center mb-6 space-x-2">
             <div className="relative">
               <div className={`w-3 h-3 rounded-full ${aiThinking ? 'bg-yellow-500' : 'bg-green-500'}`}>
-                {/* Pulsing animation ring */}
                 <div className={`absolute inset-0 rounded-full ${aiThinking ? 'animate-none' : 'animate-ping'} 
                   ${aiThinking ? 'bg-yellow-400' : 'bg-green-400'} opacity-75`}>
                 </div>
@@ -113,7 +109,7 @@ export default function SearchEngine() {
             </span>
           </div>
 
-          {/* Enhanced Search Form */}
+          {/* Search Form */}
           <form onSubmit={handleSearch} className="mb-8">
             <div className="relative">
               <input
@@ -148,13 +144,20 @@ export default function SearchEngine() {
             </div>
           </form>
 
-          {/* AI Processing Visualization */}
+          {/* Error Message */}
+          {error && (
+            <div className="mb-8 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-300">
+              {error}
+            </div>
+          )}
+
+          {/* Processing Steps */}
           {isSearching && (
             <div className="mb-8 p-6 backdrop-blur-sm bg-black/30 rounded-3xl border border-white/10">
               <div className="space-y-4">
                 {processingSteps.map((step, index) => (
                   <div key={index} className="flex items-center space-x-3 text-sm">
-                    <FiBrain className="w-4 h-4 text-blue-400 animate-pulse" />
+                    <FiCpu className="w-4 h-4 text-blue-400 animate-spin" />
                     <span className="text-gray-300">{step}</span>
                   </div>
                 ))}
@@ -162,65 +165,32 @@ export default function SearchEngine() {
             </div>
           )}
 
-          {/* AI Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="feature-card">
-              <FiCommand className="w-6 h-6 text-blue-400" />
-              <h3 className="text-lg font-semibold">Natural Language Processing</h3>
-              <p className="text-sm text-gray-400">Advanced understanding of human queries</p>
-            </div>
-            <div className="feature-card">
-              <FiDatabase className="w-6 h-6 text-purple-400" />
-              <h3 className="text-lg font-semibold">Knowledge Graph</h3>
-              <p className="text-sm text-gray-400">Interconnected information network</p>
-            </div>
-            <div className="feature-card">
-              
-              <h3 className="text-lg font-semibold">Neural Networks</h3>
-              <p className="text-sm text-gray-400">Deep learning powered search</p>
-            </div>
-            <div className="feature-card">
-              <FiTrendingUp className="w-6 h-6 text-green-400" />
-              <h3 className="text-lg font-semibold">Real-time Analysis</h3>
-              <p className="text-sm text-gray-400">Live data processing and insights</p>
-            </div>
-          </div>
-
-          {/* Search Suggestions */}
-          <div className="space-y-6 backdrop-blur-sm bg-black/30 p-8 rounded-3xl border border-white/10">
-            <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
-              AI-Powered Suggestions
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {searchSuggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSearchQuery(suggestion)}
-                  className="px-4 py-2 bg-gray-800/50 rounded-full text-sm
-                           hover:bg-gray-700/50 transition-colors border border-white/5"
-                >
-                  {suggestion}
-                </button>
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="w-full space-y-4 mb-8 backdrop-blur-sm bg-black/30 p-6 rounded-3xl border border-white/10">
+              <h2 className="text-xl font-bold text-white mb-4">Search Results</h2>
+              {searchResults.map((result, index) => (
+                <div key={index} className="p-4 bg-gray-900/50 rounded-lg border border-white/5 hover:border-blue-500/50 transition-colors">
+                  <a 
+                    href={result.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <h3 className="text-lg font-semibold text-blue-400 hover:text-blue-300 mb-2">
+                      {result.title}
+                    </h3>
+                    {result.snippet && (
+                      <p className="text-gray-300 mb-2">{result.snippet}</p>
+                    )}
+                    <p className="text-sm text-gray-400 truncate">{result.link}</p>
+                  </a>
+                </div>
               ))}
             </div>
-          </div>
+          )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 bg-black/30 backdrop-blur-md border-t border-white/10 mt-8">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-sm text-gray-400">
-              Copyright © {new Date().getFullYear()} AI Search Engine • All rights reserved
-            </p>
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <FiCpu className="w-5 h-5 text-blue-500 animate-pulse" />
-              <span className="text-sm text-gray-400">Powered by Advanced AI</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
