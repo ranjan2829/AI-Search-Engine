@@ -1,14 +1,14 @@
-from app.database import Database
 
-def main():
-    try:
-        # Initialize database connection
-        db = Database()
-        print("MongoDB connection test successful!")
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        db.close_connection()
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+from fastapi import FastAPI
 
-if __name__ == "__main__":
-    main()
+uri = "mongodb+srv://ranjanshitole3129:ranjan3129@aiengine.ssp5a.mongodb.net/?retryWrites=true&w=majority&appName=AIEngine"
+
+
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+
+
+client.admin.command('ping')
+print("Pinged your deployment. You successfully connected to MongoDB!")
