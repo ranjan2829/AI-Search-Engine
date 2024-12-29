@@ -1,49 +1,93 @@
 "use client";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const AIBackground = () => {
-  const [particles, setParticles] = useState<Array<{
-    id: number;
-    top: number;
-    left: number;
-    delay: number;
-    duration: number;
-  }>>([]);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    // Generate particles only on client-side
-    const particleCount = 15;
-    const newParticles = Array.from({ length: particleCount }, (_, index) => ({
-      id: index,
-      top: Math.floor((index * 100) / particleCount), // Distribute evenly
-      left: Math.floor((index * 100) / particleCount),
-      delay: (index * 0.2).toFixed(2), // Consistent delays
-      duration: 2 + (index * 0.1), // Consistent durations
-    }));
-    setParticles(newParticles);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let particles: Particle[] = [];
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    class Particle {
+      x: number; // Define x property
+      y: number; // Define y property
+      speed: number; // Define speed property
+      length: number; // Define length property
+      opacity: number; // Define opacity property
+
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = 0;
+        this.y = Math.random() * (canvas.height || 0); // Ensure canvas height is used
+        this.speed = 1 + Math.random() * 2;
+        this.length = 50 + Math.random() * 100;
+        this.opacity = 0.1 + Math.random() * 0.3;
+      }
+
+      update() {
+        this.x += this.speed;
+        if (this.x > (canvas.width || 0)) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x + this.length, this.y);
+        ctx.strokeStyle = `rgba(64, 128, 255, ${this.opacity})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    const init = () => {
+      resizeCanvas();
+      particles = Array.from({ length: 50 }, () => new Particle());
+    };
+
+    const animate = () => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    init();
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="absolute w-1 h-1 bg-blue-300 rounded-full animate-pulse"
-          style={{
-            top: `${particle.top}%`,
-            left: `${particle.left}%`,
-            animation: `pulse ${particle.duration}s ease-in-out infinite`,
-            animationDelay: `${particle.delay}s`,
-            opacity: 0.6,
-            boxShadow: `
-              0 0 5px #60a5fa,
-              0 0 10px #60a5fa,
-              0 0 15px #3b82f6
-            `
-          }}
-        />
-      ))}
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full pointer-events-none"
+      style={{ background: 'linear-gradient(to bottom, #000000, #0a192f)' }}
+    />
   );
 };
 
