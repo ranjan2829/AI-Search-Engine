@@ -8,7 +8,7 @@ import {
   FiInfo, 
   FiBook, 
   FiCpu, 
-  FiBrain, 
+   
   FiDatabase 
 } from 'react-icons/fi';
 import dynamic from 'next/dynamic';
@@ -25,7 +25,7 @@ type FeatureItem = {
 // Define features outside of the component
 const features: FeatureItem[] = [
   { icon: FiCpu, text: 'Neural Processing' },
-  { icon: FiBrain, text: 'Machine Learning' },
+  { icon: FiCpu, text: 'Machine Learning' },
   { icon: FiDatabase, text: 'Deep Learning' }
 ];
 
