@@ -15,42 +15,49 @@ const AIBackground = () => {
     let particles: Particle[] = [];
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
 
     class Particle {
-      x: number; // Define x property
-      y: number; // Define y property
-      speed: number; // Define speed property
-      length: number; // Define length property
-      opacity: number; // Define opacity property
+      x: number=0;
+      y: number=0;
+      speed: number=0;
+      length: number=0;
+      opacity: number=0;
 
       constructor() {
         this.reset();
       }
 
       reset() {
+        if (!canvas) return;
+        
         this.x = 0;
-        this.y = Math.random() * (canvas.height || 0); // Ensure canvas height is used
+        this.y = Math.random() * canvas.height;
         this.speed = 1 + Math.random() * 2;
         this.length = 50 + Math.random() * 100;
         this.opacity = 0.1 + Math.random() * 0.3;
       }
 
       update() {
+        if (!canvas) return;
+
         this.x += this.speed;
-        if (this.x > (canvas.width || 0)) {
+        if (this.x > canvas.width) {
           this.reset();
         }
       }
 
       draw() {
+        if (!ctx || !canvas) return;
+
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
         ctx.lineTo(this.x + this.length, this.y);
-        ctx.strokeStyle = `rgba(64, 128, 255, ${this.opacity})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
         ctx.stroke();
       }
     }
@@ -61,6 +68,8 @@ const AIBackground = () => {
     };
 
     const animate = () => {
+      if (!ctx || !canvas) return;
+
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 

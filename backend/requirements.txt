@@ -5,3 +5,11 @@ python-dotenv==1.0.0
 google-api-python-client==2.108.0
 pydantic==2.4.2
 pydantic-settings==2.0.3
+pytrends
+torch
+sklearn
+bs4
+typing
+urllib
+concurrent
+requests

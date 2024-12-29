@@ -141,7 +141,7 @@ export default function Home() {
             </div>
 
             <div className="mt-16 flex gap-4 justify-center flex-wrap">
-              {features.map(({ icon: Icon, text }, index) => (
+              {features.map(({text }, index) => (
                 <div key={index} 
                      className="feature-pill">
                   

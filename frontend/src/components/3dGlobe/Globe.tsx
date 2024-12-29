@@ -1,29 +1,32 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three-stdlib';
 
 export default function Globe() {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
+    
+    // Store ref value for cleanup
+    const currentContainer = containerRef.current;
 
-    let group;
-    let camera, scene, renderer;
-    let positions, colors;
-    let particles;
-    let pointCloud;
-    let particlePositions;
-    let linesMesh;
-    let controls;
-    const particlesData = [];
+    let group: THREE.Group;
+    let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer: THREE.WebGLRenderer;
+    let positions: Float32Array, colors: Float32Array;
+    let particles: THREE.BufferGeometry;
+    let pointCloud: THREE.Points;
+    let particlePositions: Float32Array;
+    let linesMesh: THREE.LineSegments;
+    let controls: OrbitControls;
+    const particlesData: Array<{ velocity: THREE.Vector3; numConnections: number }> = [];
     
     const lc = new THREE.Color("#4F46E5");
     const maxParticleCount = 500;
-    let particleCount = 400;
+    const particleCount = 400;
     const r = 800;
     const rHalf = r / 2;
-    let v3 = new THREE.Vector3();
+    const v3 = new THREE.Vector3();
 
     const effectController = {
       minDistance: 100,
@@ -104,8 +107,9 @@ export default function Globe() {
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setClearColor(0x000000, 0);
-
-      containerRef.current.appendChild(renderer.domElement);
+      
+      // Add renderer to container
+      currentContainer.appendChild(renderer.domElement);
 
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableZoom = false;
@@ -146,7 +150,7 @@ export default function Globe() {
         particlePositions[i * 3 + 2] += particleData.velocity.z;
 
         v3.fromArray(particlePositions, i * 3);
-        let v3len = v3.length();
+        const v3len = v3.length();
         v3.normalize().negate();
         if (v3len > rHalf) particleData.velocity.reflect(v3);
 
@@ -206,10 +210,13 @@ export default function Globe() {
 
     return () => {
       window.removeEventListener('resize', onWindowResize);
-      containerRef.current?.removeChild(renderer.domElement);
+      // Use stored ref value in cleanup
+      if (currentContainer && renderer.domElement.parentElement === currentContainer) {
+        currentContainer.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, []);
 
   return <div ref={containerRef} className="w-full h-full absolute inset-0" />;
-} 
+}

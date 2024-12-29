@@ -57,12 +57,12 @@ export default function Documentation() {
                                 <code>
                                     Request:{"\n"}
                                     {"{"}
-                                    {"\n"}  "query": "example"{"\n"}
+                                    {"\n"}  &quot;query&quot;: &quot;example&quot;{"\n"}
                                     {"}"}
                                     {"\n\n"}
                                     Response:{"\n"}
                                     {"{"}
-                                    {"\n"}  "query": "example",{"\n"}  "results": ["Result 1", "Result 2"]
+                                    {"\n"}  &quot;query&quot;: &quot;example&quot;,{"\n"}  &quot;results&quot;: [&quot;Result 1&quot;, &quot;Result 2&quot;]
                                     {"\n"}
                                     {"}"}
                                 </code>
