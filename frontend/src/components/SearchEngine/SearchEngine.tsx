@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import axios from 'axios';
 import { FiSearch, FiCpu, FiZap, FiTrendingUp } from 'react-icons/fi';
 import AIFlowBackground from './AIBackground';
@@ -22,42 +22,11 @@ export default function SearchEngine() {
   const [processingSteps, setProcessingSteps] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [trendingData, setTrendingData] = useState([]);
-  const [isLive, setIsLive] = useState(true);
+  const [trendingData] = useState([]);
+  const [isLive] = useState(true);
   
 
-  useEffect(() => {
-    const fetchTrendingData = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/trending', {
-          timeout: 10000
-        });
-        
-        if (response.data && response.data.trending) {
-          setTrendingData(response.data.trending);
-          setIsLive(true);
-        }
-      } catch (error) {
-        console.error('Error fetching trending data:', error);
-        setIsLive(false);
-        let errorMessage = 'Failed to fetch trending searches.';
-        
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 429) {
-            errorMessage = 'Too many requests. Please try again later.';
-          } else if (error.response?.data?.detail) {
-            errorMessage = error.response.data.detail;
-          }
-        }
-        setError(errorMessage);
-      }
-    };
-  
-    fetchTrendingData();
-    const interval = setInterval(fetchTrendingData, 5 * 60 * 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
+ 
 
   const simulateAIProcessing = async () => {
     const steps = [

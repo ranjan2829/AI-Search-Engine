@@ -134,3 +134,37 @@ body {
     transform: scale(1);
   }
 }
+@layer components {
+  .nav-button {
+    @apply p-2 rounded-full hover:bg-white/5 transition-all duration-200;
+  }
+  
+  .primary-button {
+    @apply px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-300 shadow-lg;
+  }
+  
+  .secondary-button {
+    @apply px-6 py-3 rounded-full bg-gray-800 hover:bg-gray-700 text-white font-medium transition-all duration-300 border border-white/10;
+  }
+  
+  .feature-pill {
+    @apply px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm backdrop-blur-sm transition-all duration-300 hover:bg-white/10;
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+.animate-blink {
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+@layer components {
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}
