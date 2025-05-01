@@ -32,9 +32,7 @@ https://github.com/user-attachments/assets/1d3c91a9-0ec5-4c5f-8fee-ba553fe2b53b
   - Authentication: JWT or OAuth2
 - Semantic Search:
   - OpenAI API, Hugging Face models, or custom-trained embeddings
-- Hosting & Deployment:
-  - Vercel/Netlify for frontend
-  - AWS/GCP/Heroku for backend
+
 
 ### 4. Search Engine UI
 - **Design Search Interface**:
